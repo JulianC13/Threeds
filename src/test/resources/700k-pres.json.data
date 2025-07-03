@@ -1,0 +1,43 @@
+{
+  "serialNum": "5780074",
+  "messageType": "PRes",
+  "dsTransID": "9f05c4e2-e3a2-4127-b3f6-e9957a2c597d",
+  "cardRangeData": [
+    {
+      "startRange": "4000020000000000",
+      "endRange": "4000020009999999",
+      "actionInd": "A",
+      "acsEndProtocolVersion": "2.1.0",
+      "threeDSMethodURL": "https://secure4.arcot.com/content-server/api/tds2/txn/browser/v1/tds-method",
+      "acsStartProtocolVersion": "2.1.0",
+      "acsInfoInd": [
+        "01",
+        "02"
+      ]
+    },
+    {
+      "startRange": "4000022040000000",
+      "endRange": "4000022089999999",
+      "actionInd": "A",
+      "acsEndProtocolVersion": "2.1.0",
+      "threeDSMethodURL": "https://secure4.arcot.com/content-server/api/tds2/txn/browser/v1/tds-method",
+      "acsStartProtocolVersion": "2.1.0",
+      "acsInfoInd": [
+        "01",
+        "02"
+      ]
+    },
+    {
+      "startRange": "4000022560000000",
+      "endRange": "4000022569999999",
+      "actionInd": "A",
+      "acsEndProtocolVersion": "2.1.0",
+      "threeDSMethodURL": "https://secure4.arcot.com/content-server/api/tds2/txn/browser/v1/tds-method",
+      "acsStartProtocolVersion": "2.1.0",
+      "acsInfoInd": [
+        "01",
+        "02"
+      ]
+    }
+  ]
+}
