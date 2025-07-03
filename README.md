@@ -8,11 +8,11 @@ This Spring Boot 3 application implements a 3DS Server to store and retrieve car
 
 This project explicitly addresses areas where requirements were ambiguous or underspecified:
 
-1. **Overlapping Ranges**: When a PAN matches multiple card ranges, the most specific (smallest) range is returned to favor precision and recency.
-2. **Duplicate BIN Ranges**: Inserting a range that already exists replaces the old value, ensuring consistent and deterministic behavior.
+1. **Overlapping Ranges**: When a PAN matches multiple card ranges, the most specific (smallest) range is returned to favour precision and recency.
+2. **Duplicate BIN Ranges**: Inserting a range that already exists replaces the old value, ensuring consistent and deterministic behaviour.
 3. **Invalid Input**: Validation is performed in the model and service layers to prevent malformed data from being accepted.
-4. **Storage Strategy**: In-memory only (as no persistence layer was specified), prioritizing speed and simplicity.
-5. **Performance Requirements**: No strict SLAs were defined; performance was benchmarked and documented to demonstrate system behavior at scale.
+4. **Storage Strategy**: In-memory only (as no persistence layer was specified), prioritising speed and simplicity.
+5. **Performance Requirements**: No strict SLAs were defined; performance was benchmarked and documented to demonstrate system behaviour at scale.
 
 ## Technical Architecture & Design Decisions
 
@@ -23,7 +23,7 @@ This project explicitly addresses areas where requirements were ambiguous or und
 **Solution**:
 
 - **Jackson Optimization**: Used `@JsonIgnoreProperties(allowGetters = true, ignoreUnknown = true)` to reduce reflection overhead by ~40%
-- **Streaming Deserialization**: Minimizes memory footprint for large payloads
+- **Streaming Deserialization**: Minimises memory footprint for large payloads
 - **Validation**: Enforced at the `CardRange` constructor level to fail fast
 - **Batch Processing**: Batches of 100k entries reduce GC pressure and improve throughput
 
@@ -40,9 +40,9 @@ This project explicitly addresses areas where requirements were ambiguous or und
 **Solution**:
 
 - **Custom IntervalTree**: Binary search with max-end tracking for O(log n) lookup time
-- **ReentrantReadWriteLock**: Enables concurrent reads while serializing writes
-- **Conflict Resolution**: Selects smallest matching range to avoid ambiguity
-- **Input Randomization**: Shuffles inputs to prevent degenerate trees and StackOverflowErrors
+- **ReentrantReadWriteLock**: Enables concurrent reads while serialising writes
+- **Conflict Resolution**: Selects the smallest matching range to avoid ambiguity
+- **Input Randomisation**: Shuffles inputs to prevent degenerate trees and StackOverflowErrors
 
 **Performance Characteristics**:
 
@@ -56,14 +56,35 @@ This project explicitly addresses areas where requirements were ambiguous or und
 
 **Solution**:
 
-- **Smallest Range Wins**: Prioritize specificity (i.e., shortest range length)
+- **Smallest Range Wins**: Prioritise specificity (i.e., shortest range length)
 - **Deterministic Behavior**: Repeatable, predictable selection
 - **Design Justification**: Assumes newer ranges are more specific and overrides broad legacy ones
+
 
 **Trade-offs**:
 
 - Slightly slower than “first match”
 - But safer and more useful in real-world scenarios
+
+### 4. Deserialization Bottleneck & Optimisation
+
+**Challenge**: During large PRes message ingestion (e.g., 700k+ ranges), deserialization became a key performance bottleneck, often consuming >50% of total POST time.
+
+**Observations**:
+- Standard Jackson deserialization is simple but GC-heavy for large nested arrays
+- For 700k entries: deserialization ≈ 600–700ms, insertion ≈ 600–800ms
+
+**Solution**:
+- @JsonIgnoreProperties(ignoreUnknown = true) to reduce field reflection
+- Manual streaming of incoming JSON using Jackson’s MappingIterator
+- Batch processing of objects (e.g., chunks of 100k) to limit GC pressure
+
+
+**Conclusion**:
+Despite implementing Jackson streaming, the performance gain was minimal (<5%). Given the added complexity and reduced readability, we retained the higher-level Jackson mapping approach for maintainability.
+
+**Future Consideration**:
+If parsing ever becomes a hard constraint, we could think of offloading parsing to a dedicated service using a faster alternative library 
 
 ## Performance Benchmarks
 
@@ -98,12 +119,12 @@ Metrics from full integration tests:
 #### 1. Controller vs Service Performance
 
 - Controller is ~6x slower than direct service calls due to Spring overhead
-- Service layer is optimized for batch and internal use
+- The service layer is optimised for batch and internal use
 - Both scale linearly with input size
 
 #### 2. Memory Efficiency
 
-- Up to 1M ranges fits in 4GB heap
+- Up to 1M ranges fit in 4GB heap
 - Linearly increasing memory usage
 - Batch processing avoids OOM during peak inserts
 
@@ -111,7 +132,7 @@ Metrics from full integration tests:
 
 - <1ms for up to 100k entries
 - ~230ms for 1M entries
-- Lookup speed stable due to tree balancing
+- Lookup speed is stable due to tree balancing
 
 #### 4. Concurrency
 
@@ -161,9 +182,7 @@ Content-Type: application/json
 
 Requires a large PRes message payload (e.g., 700k+ ranges) to observe performance behavior
 
-# Returns detailed timing information for deserialization and storage
-
-## Setup & Usage
+# Setup & Usage
 
 ### Prerequisites
 
@@ -172,17 +191,17 @@ Requires a large PRes message payload (e.g., 700k+ ranges) to observe performanc
 
 ### Build & Run
 
-# Build the project
+### Build the project
 
 ./mvnw clean package
 
-# Run with default settings (2GB heap)
+### Run with default settings (2GB heap)
 
 ./mvnw spring-boot:run
 
-### Running All Tests (with Large Datasets)
+## Running All Tests (with Large Datasets)
 
-## Note on Test Data
+### Note on Test Data
 
 The provided sample JSON (`700k-pres.json.data`) is too large to include directly in this repository due to size constraints.
 
@@ -210,7 +229,7 @@ If you want to run full-scale tests, please obtain the original sample file and 
 
 ## Design Trade-offs & Alternatives Considered
 
-## Why Not a Self-Balancing Tree?
+### Why Not a Self-Balancing Tree?
 
 Although AVL and Red-Black Trees offer height balancing, in this context:
 
@@ -221,7 +240,7 @@ Although AVL and Red-Black Trees offer height balancing, in this context:
   - Predictable and reliable performance
   - Simpler thread-safe integration using `ReentrantReadWriteLock`
 
-As such, the trade-off favored clarity and control over added complexity.
+As such, the trade-off favoured clarity and control over added complexity.
 
 ## Testing Strategy
 
@@ -257,4 +276,3 @@ This system demonstrates:
 - **Robust architecture**: Concurrency-safe, scalable, and precise
 - **Clear problem-solving**: Thoughtful handling of ambiguity and trade-offs
 
-Its design favors real-world reliability, extensibility, and performance — all essential traits for a production-grade backend service.
