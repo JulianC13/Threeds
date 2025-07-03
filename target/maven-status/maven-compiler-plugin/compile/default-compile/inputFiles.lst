@@ -1,0 +1,10 @@
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/ThreedsApplication.java
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/controller/ThreeDSController.java
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/exception/CardRangeNotFoundException.java
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/exception/GlobalExceptionHandler.java
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/model/CardRange.java
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/model/IntervalTree.java
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/model/PResMessage.java
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/repository/CardRangeRepository.java
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/service/CardRangeService.java
+/Users/juliancamilo/Documents/Programacion/threeds/src/main/java/com/example/threeds/util/TestDataGenerator.java
